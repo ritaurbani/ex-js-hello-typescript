@@ -65,11 +65,11 @@ dati2.push(45) //ora non fa fare piu modifiche
 //Per poter modificare i dati, devo usare il let per dichiarare dati2, e ora posso cambiare il 23, ma lunghezza sempre uguale
 let dati2: readonly ["test", number] = ["test", 60]//readonly si riferisce agli elems non alla variabile
 
-//TUPLE WITH REST OPERATOR
-const tags: [string, ...string[]] = ["java"]//quest array non puo essere vuoto, almeno una stringa
+//TUPLE WITH REST OPERATOR (rest operator means that the strings are optional)
+const tags: [string, ...string[]] = ["java"]//quest array non puo essere vuoto, almeno una stringa, la prima, il resto puo essere stringhe opzionali
 tags.push("typescript")//posso aggiungere quante stringhe voglio as long as there is at least one
 
-/////////////////////OGGETTI E ALIAS
+/////////////////////OGGETTI E ALIAS/////////////
 
 const user: {
     nome: string,
