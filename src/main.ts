@@ -124,3 +124,73 @@ const utente2 : Utente = {
     nome: "tizio",
     eta: 34
 }
+
+//////////////////////////////////FUNZIONI//////////////////////////////////
+
+//tipizzare callback function quando usate come parametro di HOF
+
+function modificaNumero(num: number, callback: (value: number) => number): number{
+    return callback(num)
+}
+
+//doppio e la callback cui passo un number
+function doppio(x: number){
+    return x*2
+}
+
+//result ritorna il valore che ritorna doppio quando la eseguo passandogli 5
+const result = modificaNumero(5, doppio)
+
+////////////////////////////////Fetch with generics/////////////////
+
+//gestire fetch usando generic, quando creo funzione di appoggio asincrona per raccogliere dei dati uando fetch
+//avro a che fare con type alias...se recupero risorsa utente, avro a che fare con type alias utente
+//quindi devo essere in grado di gestire che il tipo ricevuto sia effettivamente un utente
+
+type Utente = {
+    id: number,
+    nome: string,
+    emmail: string
+}
+
+//ho funzione asincrona che recupera utente a partire dal suo id e ritorna una Promise
+//TUTTE LE FUNZIONI AASINCRONE RITORNANO UNA PROMISE CHE RISOLVONO IL VALORE CHE TU FAI IN RETURN
+//in generics specifico cosa la Promise risolve, cioe in getUtente vogliamo ottenere un Utente
+//non tutte le fetch vanno a buon fine, id richiesto non corrisponde a utente..quindi errori da gestire con union types
+async function getUtente(id: number):Promise<Utente | null> { //ritorno null se qualcosa non va a buon fine, non trovato utente con quell id
+//funzione asincrona quindi raccolgo tutto in try e catch (se voglio propagare errore non lo faccio)
+//in try facciamo fetch per recuperare utente rispetto al nostro id
+try{
+//response automaticamete salvata come type response, perche fetch ritorna questo oggetto particolare
+//di tipo response, quindi non devo specificarlo in modo esplicito cosi response: Response, perche tye inference lo fa per me
+const response = await fetch(`http:miosito.com/utenti/${id}`)
+//per raccogliere dati mi devo accertare che chiamata sia andata a buon fine: status 400
+if(!response.ok){ 
+    throw new Error(`errore http${response.status}: ${response.statusText}`)//rompe esecuzione portandoci a catch..
+}
+//se response e andata a buon fine faccio await..
+//ts fa si che json ci ritorna come promessa qualcosa che risolve un any (dati:any) a noi non piece
+const dati = await response.json(); //dati qui e di tipo any, se uso dati:unknown non funzione quindi type narrowing e necessario
+// if(!dati.id || !dati.nome || !dati.email){
+//     throw new Error('formato dati non valido')
+// }
+//COME CAPISCO SE DATI SONO BUONI?????
+//1.dati deve essere un valore che non sia null, undefined...tutto cio che e truthy prosegue questo controllo...
+//2.visto che utente e oggetto dobbiamo vedere se dati e object altrimenti non possiamo fare dati.id...
+if(
+    dati &&
+    typeof dati === 'object' &&
+    "id" in dati && //per capire se posso accedere a dati la stringa id e la chiave di una delle proprieta di dati
+    typeof dati.id === 'number' &&
+    "nome" in dati &&
+    typeof dati.nome === "string" &&
+    "email" in dati &&
+    typeof dati.email === "string"
+)
+
+}catch(errore){
+    console.error(errore), 
+ return null
+}
+
+}
