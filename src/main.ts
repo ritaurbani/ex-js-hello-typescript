@@ -141,7 +141,29 @@ function doppio(x: number){
 //result ritorna il valore che ritorna doppio quando la eseguo passandogli 5
 const result = modificaNumero(5, doppio)
 
-////////////////////////////////Fetch with generics/////////////////
+////////////////////////////////Fetch with generics - Type guards/////////////////
+//Type guards personalizzati 
+//Creo Funzione di supporto isUtente, type guard personalizzato che a partire da dati o utente ipotetico, 
+//in questa funzione personalizzata ho specificato io quali sono le caratteristiche che mi fanno capire se qualcosa e un utente o no..
+//mi ritorna un booleano, che mi fa capire se abbiamo a che fare con utente o meno
+//is e usata per creare type guards generici - dati is utente e dicitura per creare funzione che ci ritorna un booleano
+//che fa capire a ts se questa cosa unknown che ho passato(dati) e un utente oppure no
+function isUtente(dati: unknown): dati is Utente{//controllo se isUtente rispecchia Utente
+    if (//se tutte sono vere allora quello che ho in mano rispetta type alias utente
+        dati && //punto di partenza e truthy e conferma se oggetto
+        typeof dati === 'object' &&
+        dati !== null &&
+        "id" in dati && //la stringa id e la chiave di una delle proprieta di dati?? se si allora controlla dati.id
+        typeof dati.id === 'number' && //non voglio solo vedere se dati.id esiste ma anche se e un numero?
+        "nome" in dati && // c'e` proprieta nome? se c e e una stringa?
+        typeof dati.nome === "string" &&
+        "email" in dati &&
+        typeof dati.email === "string"
+    ) {//se tutte sono vere allora quello che ho in mano rispetta type alias utente, e posso fare return dati
+        return true //dico a ts se queste cose sono vere abbiamo a che fare con Utente, quindi torniamo Utnete o null
+    }
+     return false
+}
 
 //gestire fetch usando generic, quando creo funzione di appoggio asincrona per raccogliere dei dati uando fetch
 //avro a che fare con type alias...se recupero risorsa utente, avro a che fare con type alias utente
@@ -175,22 +197,40 @@ const dati = await response.json(); //dati qui e di tipo any, se uso dati:unknow
 //     throw new Error('formato dati non valido')
 // }
 //COME CAPISCO SE DATI SONO BUONI?????
-//1.dati deve essere un valore che non sia null, undefined...tutto cio che e truthy prosegue questo controllo...
-//2.visto che utente e oggetto dobbiamo vedere se dati e object altrimenti non possiamo fare dati.id...
-if(
-    dati &&
-    typeof dati === 'object' &&
-    "id" in dati && //per capire se posso accedere a dati la stringa id e la chiave di una delle proprieta di dati
-    typeof dati.id === 'number' &&
-    "nome" in dati &&
-    typeof dati.nome === "string" &&
-    "email" in dati &&
-    typeof dati.email === "string"
-)
+//1.dati deve essere un valore che non sia null, undefined...dati && > tutto cio che e truthy prosegue questo controllo...
+//2.visto che utente e oggetto dobbiamo vedere se dati e'object altrimenti non possiamo fare dati.id...
+//ma anche id potrebbe non esistere in questo obj, quindi per capire i tipi usiamo type guards:
+//typeof, instanceof, in (capisco se posso accedere a id)
+//se tutte sono vere allora quello che ho in mano rispetta type alias utente
+//metto tutti questi if nella funzione di supporto isUtente
+// if(
+//     dati &&
+//     typeof dati === 'object' &&
+//     "id" in dati && //la stringa id e la chiave di una delle proprieta di dati?? se si allora controlla dati.id
+//     typeof dati.id === 'number' && //non voglio solo vedere se dati.id esiste ma anche se e un numero?
+//     "nome" in dati && // c'e` proprieta nome? se c e e una stringa?
+//     typeof dati.nome === "string" &&
+//     "email" in dati &&
+//     typeof dati.email === "string"
+// ) {//se tutte sono vere allora quello che ho in mano rispetta type alias utente, e posso fare return dati
+//     return dati as Utente //dico a ts se queste cose sono vere abbiamo a che fare con Utente, quindi torniamo Utnete o null
+// }
+if(!isUtente(dati)){
+     throw new Error('formato dati non valido')
+}
+    return dati
+}catch(errore){//errore lanciato in casistiche in cui non ritorna utente
+    if(errore instanceof Error){
+            console.error("errore durante recuperp dati:", errore.message)
 
-}catch(errore){
-    console.error(errore), 
+    } else {
+        console.error('errore sconosciuto', errore)
+    }
  return null
 }
 
 }
+
+//abbiamo gestito dati:unknown
+//type guard personalizzato,
+//gestendo errore
