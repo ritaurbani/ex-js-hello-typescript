@@ -143,6 +143,13 @@ const result = modificaNumero(5, doppio)
 
 ////////////////////////////////Fetch with generics - Type guards/////////////////
 //Type guards personalizzati 
+
+// La funzione isUtente è una type guard (guardia di tipo) che verifica 
+// se un oggetto sconosciuto(unknown) rispetta la struttura del tipo Actress.
+// In pratica, controlla due cose:
+// Forma dell'oggetto: Presenza di tutte le proprietà obbligatorie
+// Tipi dei valori: Corrispondenza dei tipi dichiarati(es.id deve essere number)
+
 //Creo Funzione di supporto isUtente, type guard personalizzato che a partire da dati o utente ipotetico, 
 //in questa funzione personalizzata ho specificato io quali sono le caratteristiche che mi fanno capire se qualcosa e un utente o no..
 //mi ritorna un booleano, che mi fa capire se abbiamo a che fare con utente o meno
