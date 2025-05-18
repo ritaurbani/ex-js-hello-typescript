@@ -241,3 +241,42 @@ if(!isUtente(dati)){
 //abbiamo gestito dati:unknown
 //type guard personalizzato,
 //gestendo errore
+
+///////REACT with PROPS
+
+//creo type alia che rappresenta props del nostro componente
+
+type ButtonProps = {//in App stismo usando solo text quindi le altre sono solo opzionali
+    text: string,
+    backgroundColor?: string,
+    fontSize?: number,
+    isActive?: boolean
+} 
+
+export default function Button({//elenco props e poi i loro types
+    text,
+    backgroundColor,
+    fontSize,
+    isActive = false //posso anche dare valore di default
+} : ButtonProps){
+    return(
+        <button 
+            style={{
+            backgroundColor: backgroundColor,
+            fontSize: `${fontSize}px`
+        }} 
+        className= {`button ${isActive? 'active': ''}`}>
+        {text}
+        </button>
+    )
+}
+
+fucntion App(){
+    <Button 
+    text="cliccami"
+    fontSize = {15}
+    backgroundColor='red'
+    />
+}
+
+//////////TIPIZZARE useState e useEffect
