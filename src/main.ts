@@ -242,9 +242,9 @@ if(!isUtente(dati)){
 //type guard personalizzato,
 //gestendo errore
 
-///////REACT with PROPS
+                                  ///////////////REACT with PROPS/////////////////
 
-//creo type alia che rappresenta props del nostro componente
+//creo type alias che rappresenta props del nostro componente
 
 type ButtonProps = {//in App stismo usando solo text quindi le altre sono solo opzionali
     text: string,
