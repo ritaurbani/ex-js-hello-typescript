@@ -17,7 +17,7 @@ value = "hello"
 let value3:"ciao" = "ciao"
 const value1 = "ciao" //usa const per creare variabile immutabile - value1 e di tipo ciao
 
-//4.Union Types
+//4.Union Types 
 //posso contenere in variabile modality just attivo o disactived:
 let modality: "active" | "disactive"
 modality = "ciao" //ERROR - perche variabile puo essere solo active or disactive
@@ -49,10 +49,17 @@ if(typeof value5 === 'string'){
 }
 
 
+
                                                ///////////////TUPLE//////////////
 //creo array dati che puo contenere all interno un qualsiasi numero di elem, literal type e generic...
-const dati: ("test" | number) [] = ["test", 1,54,"test",5] //as many elem I want, and also push...is ok
-//qui invece dico che l array e una tuple, ha sempre come primo elem la stringa test, e secondo un numero, e non piu di cosi...
+const dati: ("test" | number) [] = ["test", 1,54,"test",5] //as many elem I want, and also push...is ok, also empty is ok
+const dati: ("test"|number)[] = ["test", 1, 4, 6, "test", ]
+
+//TUPLE-qui invece dico che l array e una tuple, ha sempre come primo elem la stringa test, e secondo un numero, e non piu di cosi...
+//sequenza ordinata con lunghezza esattamente 2
+//per rappresentare strutture dati precise: Stato autenticazione: [logged, username]
+//as const;
+const auth: [boolean, string] = [true, "Alice"];
 const dati2 : ["test", number] = ["test", 23]  //["test", 23, 45] ERROR - [23,"test"] ERROR(primo elem deve essere test)
 dati2[0] = 12 //ERROR
 //posso inserire nuovi dati che rispecchiano ["test", number] - non segnala errori ma non si potrebbe fare > readonly
@@ -62,14 +69,17 @@ dati2.push("hello") //ERROR
 //readonly
 const dati2: readonly["test", number] = ["test", 23]
 dati2.push(45) //ora non fa fare piu modifiche
-//Per poter modificare i dati, devo usare il let per dichiarare dati2, e ora posso cambiare il 23, ma lunghezza sempre uguale
+
+//OK MODIFICA CON LET - Per poter modificare i dati, devo usare il let per dichiarare dati2, e ora posso cambiare il 23, ma lunghezza sempre uguale
 let dati2: readonly ["test", number] = ["test", 60]//readonly si riferisce agli elems non alla variabile
 
 //TUPLE WITH REST OPERATOR (rest operator means that the strings are optional)
 const tags: [string, ...string[]] = ["java"]//quest array non puo essere vuoto, almeno una stringa, la prima, il resto puo essere stringhe opzionali
 tags.push("typescript")//posso aggiungere quante stringhe voglio as long as there is at least one
+//with const I cannot reassign the variable, but I can modify the 
 
-/////////////////////OGGETTI E ALIAS/////////////
+
+                                      /////////////////////OGGETTI E ALIAS/////////////////////
 
 const user: {
     nome: string,
@@ -85,6 +95,8 @@ const jobMaiuscolo = user.job === 'string' && user.job.toUpperCase() //controllo
 //se esiste eseguo metodo oppure sotto uso Optional Chain, cioe prima di toUpperCase metto punto di domanda
 const jobMaiuscolo = user.job && user.job.toUpperCase() //se esiste eseguo il metodo
 const jobMaiuscolo = user.job?.toUpperCase() //se esiste eseguo il metodo
+
+const maiuscolo = user.job === "string" && user.job.toUpperCase()
 
 const user: {
     readonly nome: string,
@@ -133,6 +145,11 @@ function modificaNumero(num: number, callback: (value: number) => number): numbe
     return callback(num)
 }
 
+function doppio(num: number){
+    return num*2
+}
+const result = modificaNumber(5, doppio)
+
 //doppio e la callback cui passo un number
 function doppio(x: number){
     return x*2
@@ -141,10 +158,39 @@ function doppio(x: number){
 //result ritorna il valore che ritorna doppio quando la eseguo passandogli 5
 const result = modificaNumero(5, doppio)
 
-////////////////////////////////Fetch with generics - Type guards/////////////////
+
+////////////////////////////////Fetch with generics - Type guards///////////////////
+
+////////////PROMISES///////////////
+
+// Funzione che ritorna una Promise tipizzata
+const fetchData = (url: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (url.startsWith("https")) {
+                resolve("Dati ricevuti");
+            } else {
+                reject(new Error("URL non sicuro"));
+            }
+        }, 1000);
+    });
+};
+
+// Utilizzo con async/await
+const getApiData = async (): Promise<void> => {
+    try {
+        const result: string = await fetchData("https://api.example.com");
+        console.log(result.toUpperCase()); // "DATI RICEVUTI"
+    } catch (error) {
+        console.error((error as Error).message);
+    }
+};
+
+getApiData();
+
 //Type guards personalizzati 
 
-// La funzione isUtente è una type guard (guardia di tipo) che verifica 
+// La funzione isUtente è una Funzione di supporto, type guard (guardia di tipo) che verifica 
 // se un oggetto sconosciuto(unknown) rispetta la struttura del tipo Actress.
 // In pratica, controlla due cose:
 // Forma dell'oggetto: Presenza di tutte le proprietà obbligatorie
@@ -167,7 +213,7 @@ function isUtente(dati: unknown): dati is Utente{//controllo se isUtente rispecc
         "email" in dati &&
         typeof dati.email === "string"
     ) {//se tutte sono vere allora quello che ho in mano rispetta type alias utente, e posso fare return dati
-        return true //dico a ts se queste cose sono vere abbiamo a che fare con Utente, quindi torniamo Utnete o null
+        return true //dico a ts se queste cose sono vere abbiamo a che fare con Utente, quindi torniamo Utete o null
     }
      return false
 }
@@ -183,7 +229,7 @@ type Utente = {
 }
 
 //ho funzione asincrona che recupera utente a partire dal suo id e ritorna una Promise
-//TUTTE LE FUNZIONI AASINCRONE RITORNANO UNA PROMISE CHE RISOLVONO IL VALORE CHE TU FAI IN RETURN
+//TUTTE LE FUNZIONI ASINCRONE RITORNANO UNA PROMISE CHE RISOLVONO IL VALORE CHE TU FAI IN RETURN
 //in generics specifico cosa la Promise risolve, cioe in getUtente vogliamo ottenere un Utente
 //non tutte le fetch vanno a buon fine, id richiesto non corrisponde a utente..quindi errori da gestire con union types
 async function getUtente(id: number):Promise<Utente | null> { //ritorno null se qualcosa non va a buon fine, non trovato utente con quell id
@@ -191,7 +237,7 @@ async function getUtente(id: number):Promise<Utente | null> { //ritorno null se 
 //in try facciamo fetch per recuperare utente rispetto al nostro id
 try{
 //response automaticamete salvata come type response, perche fetch ritorna questo oggetto particolare
-//di tipo response, quindi non devo specificarlo in modo esplicito cosi response: Response, perche tye inference lo fa per me
+//di tipo response, quindi non devo specificarlo in modo esplicito cosi response: Response, perche type inference lo fa per me
 const response = await fetch(`http:miosito.com/utenti/${id}`)
 //per raccogliere dati mi devo accertare che chiamata sia andata a buon fine: status 400
 if(!response.ok){ 
@@ -226,6 +272,8 @@ if(!isUtente(dati)){
      throw new Error('formato dati non valido')
 }
     return dati
+
+
 }catch(errore){//errore lanciato in casistiche in cui non ritorna utente
     if(errore instanceof Error){
             console.error("errore durante recuperp dati:", errore.message)
@@ -241,6 +289,19 @@ if(!isUtente(dati)){
 //abbiamo gestito dati:unknown
 //type guard personalizzato,
 //gestendo errore
+
+//Controlli se l'errore è un oggetto "standard" di tipo Error (con proprietà come .message, .stack)
+//Se non fai questo controllo, accedere a errore.message potrebbe causare un nuovo errore se errore è una stringa / number / altro.
+
+// MAI fare questo (pericoloso):
+console.log(errore.message); // ❌ Rischi un crash se errore è una stringa
+
+// Fai sempre:
+if (errore instanceof Error) {
+    // Safe: so che ha .message
+} else {
+    // Gestisci il caso "non-Error"
+}
 
                                   ///////////////REACT with PROPS/////////////////
 
